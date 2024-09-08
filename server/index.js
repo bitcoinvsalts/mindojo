@@ -2,8 +2,11 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import { google } from "googleapis";
+import cors from "cors"; // Import cors
 
 const app = express();
+app.use(cors()); // Enable All CORS Requests
+
 const port = process.env.PORT || 3001;
 const apiKey = process.env.GOOGLE_API_KEY;
 const spreadsheetId = process.env.SPREADSHEET_ID;

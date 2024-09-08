@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     const fetchTabs = async () => {
       try {
-        const response = await fetch("http://localhost:3001/grids");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/grids`);
         console.log(response);
         const data = await response.json();
         console.log(data);

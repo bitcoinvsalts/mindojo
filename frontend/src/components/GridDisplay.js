@@ -6,7 +6,9 @@ function GridDisplay({ tab }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/grid/${tab}`);
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/grid/${tab}`
+        );
         const data = await response.json();
         setGridData(data);
       } catch (error) {
