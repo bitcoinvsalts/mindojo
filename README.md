@@ -34,18 +34,18 @@ yarn
 
 Create a .env file in the project root with the following variables:
 
-plaintext```
+```
 PORT=3001
 GOOGLE_API_KEY=your_google_api_key
 SPREADSHEET_ID=your_spreadsheet_id
 
-````
+```
 
 In the React app, create a .env file in the root of the React project with:
 
-```plaintext
+```
 REACT_APP_API_URL=http://localhost:3001
-````
+```
 
 ## Running the Application
 
