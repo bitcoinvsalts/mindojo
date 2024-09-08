@@ -49,16 +49,23 @@ function canWaterFlow(grid) {
   bfs(0, 0, reachedNW);
   bfs(rows - 1, cols - 1, reachedSE);
 
-  return grid.map((row, i) =>
-    row.map((elevation, j) => ({
-      elevation: elevation,
-      status: {
-        NW: reachedNW[i][j],
-        SE: reachedSE[i][j],
-        Both: reachedNW[i][j] && reachedSE[i][j],
-      },
-    }))
+  let countBoth = 0;
+  const detailedGrid = grid.map((row, i) =>
+    row.map((elevation, j) => {
+      const isBoth = reachedNW[i][j] && reachedSE[i][j];
+      if (isBoth) countBoth++;
+      return {
+        elevation: elevation,
+        status: {
+          NW: reachedNW[i][j],
+          SE: reachedSE[i][j],
+          Both: isBoth,
+        },
+      };
+    })
   );
+
+  return { grid: detailedGrid, countBoth };
 }
 
 /////////////////////

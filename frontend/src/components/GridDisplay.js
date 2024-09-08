@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 function GridDisplay({ tab }) {
   const [gridData, setGridData] = useState([]);
+  const [countBoth, setCountBoth] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -9,8 +10,10 @@ function GridDisplay({ tab }) {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/grid/${tab}`
         );
+        console.log(response);
         const data = await response.json();
-        setGridData(data);
+        setGridData(data.grid);
+        setCountBoth(data.countBoth); // Set the count from the response
       } catch (error) {
         console.error("Error fetching grid data:", error);
       }
@@ -28,6 +31,8 @@ function GridDisplay({ tab }) {
         justifyContent: "center",
       }}
     >
+      <div>Cells reachable by both oceans: {countBoth}</div>{" "}
+      {/* Display the count */}
       {gridData.map((row, rowIndex) => (
         <div key={rowIndex} style={{ display: "flex" }}>
           {row.map((cell, cellIndex) => (
