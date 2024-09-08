@@ -8,6 +8,58 @@ const port = process.env.PORT || 3001;
 const apiKey = process.env.GOOGLE_API_KEY;
 const spreadsheetId = process.env.SPREADSHEET_ID;
 
+/////////////////////
+
+function canWaterFlow(grid) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const reachedNW = Array.from({ length: rows }, () => Array(cols).fill(false));
+  const reachedSE = Array.from({ length: rows }, () => Array(cols).fill(false));
+
+  function canFlow(x, y, prevHeight) {
+    return x >= 0 && x < rows && y >= 0 && y < cols && grid[x][y] >= prevHeight;
+  }
+
+  function bfs(startX, startY, reached) {
+    const queue = [[startX, startY]];
+    reached[startX][startY] = true;
+
+    while (queue.length > 0) {
+      const [x, y] = queue.shift();
+      const directions = [
+        [1, 0],
+        [0, 1],
+        [-1, 0],
+        [0, -1],
+      ];
+      for (const [dx, dy] of directions) {
+        const newX = x + dx;
+        const newY = y + dy;
+        if (canFlow(newX, newY, grid[x][y]) && !reached[newX][newY]) {
+          reached[newX][newY] = true;
+          queue.push([newX, newY]);
+        }
+      }
+    }
+  }
+
+  bfs(0, 0, reachedNW);
+  bfs(rows - 1, cols - 1, reachedSE);
+
+  return grid.map((row, i) =>
+    row.map((elevation, j) => ({
+      elevation: elevation,
+      status: {
+        NW: reachedNW[i][j],
+        SE: reachedSE[i][j],
+        Both: reachedNW[i][j] && reachedSE[i][j],
+      },
+    }))
+  );
+}
+
+/////////////////////
+
 app.get("/grids", async (req, res) => {
   try {
     const sheets = google.sheets({ version: "v4", auth: apiKey });
@@ -26,23 +78,28 @@ app.get("/grids", async (req, res) => {
 
 // Endpoint to get the content of a specific tab
 app.get("/grid/:id", async (req, res) => {
-  const sheetId = req.params.id; // Retrieve the ID from the URL parameter
+  const sheetName = req.params.id;
   try {
     const sheets = google.sheets({ version: "v4", auth: apiKey });
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: sheetId, // Use the ID directly as the range
+      range: `${sheetName}`, // Assuming the range specifies a tab name
     });
 
-    const data = response.data.values;
-    if (data.length === 0) {
+    const values = response.data.values;
+    if (!values || values.length === 0) {
       res.status(404).send("No data found in the specified sheet");
-    } else {
-      res.status(200).json(data);
+      return;
     }
+
+    // Convert all entries to numbers for the water flow algorithm
+    const grid = values.map((row) => row.map(Number));
+    const detailedResults = canWaterFlow(grid);
+
+    res.status(200).json(detailedResults);
   } catch (error) {
     console.error(
-      `Error accessing Google Sheets API for sheet ${sheetId}: ${error}`
+      `Error accessing Google Sheets API for sheet ${sheetName}: ${error}`
     );
     res.status(500).send("Failed to retrieve data from the specified sheet");
   }
