@@ -1,9 +1,6 @@
 const grid = [
-  [1, 2, 3, 4, 50],
-  [4, 1, 1, 40, 6],
-  [5, 4, 30, 1, 7],
-  [6, 40, 3, 9, 8],
-  [10, 4, 10, 9, 9],
+  [1, 2],
+  [2, 1],
 ];
 
 function canWaterFlow(grid) {
@@ -56,6 +53,7 @@ function canWaterFlow(grid) {
   console.log(reachedNW.map((row) => row.join("")).join("\n"));
   console.log("SE Reachable Grid:");
   console.log(reachedSE.map((row) => row.join("")).join("\n"));
+
   console.log("Reachable by Both Oceans Grid:");
   console.log(reachedBoth.map((row) => row.join("")).join("\n"));
 }
